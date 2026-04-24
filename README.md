@@ -24,6 +24,7 @@ It is a temporary live demo, all data will be deleted after 10 minutes. Sponsore
 ## ⭐ Features
 
 - Monitoring uptime for HTTP(s) / TCP / HTTP(s) Keyword / HTTP(s) Json Query / Websocket / Ping / DNS Record / Push / Steam Game Server / Docker Containers
+- **LLM Model Health Monitoring** - Monitor LLM API health with active probing and passive reporting
 - Fancy, Reactive, Fast UI/UX
 - Notifications via Telegram, Discord, Gotify, Slack, Pushover, Email (SMTP), and [90+ notification services, click here for the full list](https://github.com/louislam/uptime-kuma/tree/master/src/components/notifications)
 - 20-second intervals
@@ -34,6 +35,55 @@ It is a temporary live demo, all data will be deleted after 10 minutes. Sponsore
 - Certificate info
 - Proxy support
 - 2FA support
+
+## 🤖 LLM Model Health Monitor
+
+A specialized monitor type for monitoring LLM (Large Language Model) API health and performance.
+
+### Features
+
+- **Passive Reporting**: Receive health reports from your LLM-powered applications
+- **Active Probing**: Proactively check LLM API availability on a configurable interval
+- **Health Scoring**: Automatic health score calculation based on success rate and latency
+- **Cost Tracking**: Track estimated API costs with token usage logging
+- **Multi-Provider Support**: OpenAI, Anthropic, Google, ZhipuAI, Minimax, and more
+
+### Architecture
+
+| Component | Description |
+|-----------|-------------|
+| `server/monitor-types/llm-model.js` | LLM monitor type implementation |
+| `server/routers/api-router.js` | Passive reporting API and aggregator |
+| `server/socket-handlers/llm-monitor-socket-handler.js` | Real-time socket events |
+| `db/knex_migrations/2026-04-22-0000-add-llm-monitor-fields.js` | Database schema |
+
+### Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Heartbeat Interval** | How often to display/update the UI (controls UI update frequency) |
+| **Probe Interval** | How often to execute active probing (controls API call frequency) |
+| **Passive Reporting** | Your application sends reports when LLM calls complete |
+| **Active Probing** | Uptime Kuma periodically calls the LLM API to check health |
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-04-22 | Initial LLM monitoring integration with probe interval separation |
+| 1.0.1 | 2026-04-22 | Fixed monitor implementation error (non-UP status must throw error) |
+| 1.0.2 | 2026-04-22 | Added report aggregation to prevent UI scrolling |
+| 1.0.3 | 2026-04-22 | Separated probe_interval from heartbeat interval |
+| 1.0.4 | 2026-04-22 | Added independent active probe scheduler |
+
+### Demo Scripts
+
+| Script | Port | Description |
+|--------|------|-------------|
+| `demo-llm-monitoring.js` | 3003 | Passive reporting + Mock API server |
+| `demo-active-probe.js` | 3002 | Active probing only (deep night scenario) |
+
+See [DEMO_USAGE.md](DEMO_USAGE.md) and [ACTIVE_PROBE_DEMO.md](ACTIVE_PROBE_DEMO.md) for detailed usage instructions.
 
 ## 🔧 How to Install
 

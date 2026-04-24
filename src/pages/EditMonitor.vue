@@ -80,6 +80,7 @@
                                         <option value="grpc-keyword">gRPC(s) - {{ $t("Keyword") }}</option>
                                         <option value="json-query">HTTP(s) - {{ $t("Json Query") }}</option>
                                         <option value="kafka-producer">Kafka Producer</option>
+                                        <option value="llm-model">LLM Model Health Monitor</option>
                                         <option value="mqtt">MQTT</option>
                                         <option value="rabbitmq">RabbitMQ</option>
                                         <option v-if="!$root.info.isContainer" value="sip-options">
@@ -1383,6 +1384,117 @@
                                         type="text"
                                         class="form-control"
                                     />
+                                </div>
+                            </template>
+
+                            <!-- LLM Model Monitor -->
+                            <template v-if="monitor.type === 'llm-model'">
+                                <div class="my-3">
+                                    <label for="model-name" class="form-label">Model Name</label>
+                                    <input
+                                        id="model-name"
+                                        v-model="monitor.model_name"
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="gpt-4-turbo, claude-3-opus, etc."
+                                        required
+                                    />
+                                    <div class="form-text">The LLM model identifier (e.g., gpt-4-turbo, grok-beta, sora-1.0)</div>
+                                </div>
+
+                                <div class="my-3">
+                                    <label for="llm-api-endpoint" class="form-label">API Endpoint</label>
+                                    <input
+                                        id="llm-api-endpoint"
+                                        v-model="monitor.llm_api_endpoint"
+                                        type="url"
+                                        class="form-control"
+                                        placeholder="https://api.openai.com/v1/chat/completions"
+                                        required
+                                    />
+                                    <div class="form-text">The LLM API endpoint URL</div>
+                                </div>
+
+                                <div class="my-3">
+                                    <label for="llm-api-key" class="form-label">API Key</label>
+                                    <HiddenInput
+                                        id="llm-api-key"
+                                        v-model="monitor.llm_api_key"
+                                        autocomplete="new-password"
+                                        placeholder="sk-..."
+                                        :required="true"
+                                    />
+                                    <div class="form-text">Your LLM API key (stored encrypted)</div>
+                                </div>
+
+                                <div class="my-3">
+                                    <label for="upstream-provider" class="form-label">Upstream Provider</label>
+                                    <input
+                                        id="upstream-provider"
+                                        v-model="monitor.upstream_provider"
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="openrouter, openai, anthropic, etc."
+                                    />
+                                    <div class="form-text">The upstream aggregation platform (optional)</div>
+                                </div>
+
+                                <div class="my-3">
+                                    <label for="cost-level" class="form-label">Cost Level</label>
+                                    <select id="cost-level" v-model="monitor.cost_level" class="form-select">
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                    <div class="form-text">Cost level for tracking and budgeting purposes</div>
+                                </div>
+
+                                <div class="my-3">
+                                    <div class="form-check form-switch">
+                                        <input
+                                            id="active-probe"
+                                            v-model="monitor.active_probe"
+                                            class="form-check-input"
+                                            type="checkbox"
+                                        />
+                                        <label class="form-check-label" for="active-probe">
+                                            Enable active health probes
+                                        </label>
+                                    </div>
+                                    <div class="form-text">
+                                        When enabled, sends minimal requests to check model health. Disable for passive monitoring only.
+                                    </div>
+                                </div>
+
+                                <div v-if="monitor.active_probe" class="my-3">
+                                    <label for="probe-interval" class="form-label">Probe Interval (seconds)</label>
+                                    <input
+                                        id="probe-interval"
+                                        v-model="monitor.probe_interval"
+                                        type="number"
+                                        class="form-control"
+                                        placeholder="60"
+                                        min="10"
+                                        step="1"
+                                    />
+                                    <div class="form-text">
+                                        How often to actively probe the LLM API (default: 30s for low cost, 120s for medium, 300s for high, 900s for critical)
+                                    </div>
+                                </div>
+
+                                <div class="my-3">
+                                    <label for="probe-payload" class="form-label">Probe Payload (JSON)</label>
+                                    <textarea
+                                        id="probe-payload"
+                                        v-model="monitor.probe_payload"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder='{"max_tokens": 1, "temperature": 0}'
+                                    ></textarea>
+                                    <div class="form-text">
+                                        Custom JSON payload for health probes (keep minimal to reduce costs)
+                                    </div>
                                 </div>
                             </template>
 
